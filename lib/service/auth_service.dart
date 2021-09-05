@@ -35,7 +35,7 @@ class AuthService {
       UserCredential result = await FirebaseAuth.instance.signInWithCredential(credential);
       User? user = result.user;
 
-      await DatabaseService(uid: user!.uid).updateUserData(user.displayName!, user.email!, (user.phoneNumber == null) ? "" : user.phoneNumber!);
+      await DatabaseService().updateUserData(user!.uid, user.displayName!, user.email!, (user.phoneNumber == null) ? "" : user.phoneNumber!);
       return user;
     } catch(e) {
       return null;
@@ -49,7 +49,7 @@ class AuthService {
       User? user = result.user;
 
       // Create a new document for the user with uid
-      await DatabaseService(uid: user!.uid).updateUserData(fullName, email, mobileNumber);
+      await DatabaseService().updateUserData(user!.uid, fullName, email, mobileNumber);
       return userFromFirebaseUser(user);
     } catch(e) {
       if (e.toString().contains("email-already-in-use")) {

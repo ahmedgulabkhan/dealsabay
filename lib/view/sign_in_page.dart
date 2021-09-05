@@ -37,7 +37,7 @@ class _SignInPageState extends State<SignInPage> {
 
       await _authService.signInWithEmailAndPassword(_emailEditingController.text, _passwordEditingController.text).then((result) async {
         if (result != null) {
-          QuerySnapshot userInfoSnapshot = await DatabaseService(uid: result.uid).getUserData(_emailEditingController.text);
+          QuerySnapshot userInfoSnapshot = await DatabaseService().getUserData(_emailEditingController.text);
 
           await HelperFunctions.saveUserLoggedInSharedPreference(true);
           await HelperFunctions.saveUserEmailSharedPreference(_emailEditingController.text);
@@ -203,9 +203,8 @@ class _SignInPageState extends State<SignInPage> {
                     width: double.infinity,
                     height: 50.0,
                     child: RaisedButton.icon(
-                        elevation: 0.0,
                         color: Theme.of(context).backgroundColor,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0), side: BorderSide(color: Colors.black87)),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0), side: BorderSide(color: Colors.black87, width: 0.1)),
                         label: Text('Sign In with Google', style: TextStyle(color: Colors.black87, fontSize: 16.0)),
                         icon: Image.asset("assets/google_logo.png", height: 25),
                         onPressed: () {

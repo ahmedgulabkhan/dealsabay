@@ -211,35 +211,6 @@ class _SignUpPageState extends State<SignUpPage> {
                       ),
                     ),
 
-                    Row(
-                        children: <Widget>[
-                          Expanded(
-                            child: Divider(color: Colors.black38, height: 40.0, thickness: 0.5, indent: 6.0, endIndent: 6.0),
-                          ),
-
-                          Text("OR", style: TextStyle(color: Colors.black38, fontWeight: FontWeight.bold)),
-
-                          Expanded(
-                            child: Divider(color: Colors.black38, height: 40.0, thickness: 0.5, indent: 6.0, endIndent: 6.0),
-                          ),
-                        ]
-                    ),
-
-                    SizedBox(
-                      width: double.infinity,
-                      height: 50.0,
-                      child: RaisedButton.icon(
-                          elevation: 0.0,
-                          color: Theme.of(context).backgroundColor,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0), side: BorderSide(color: Colors.black87)),
-                          label: Text('Sign up with Google', style: TextStyle(color: Colors.black87, fontSize: 16.0)),
-                          icon: Image.asset("assets/google_logo.png", height: 25),
-                          onPressed: () {
-                            // onSignInWithGoogle();
-                          }
-                      ),
-                    ),
-
                     SizedBox(height: 10.0),
 
                     Text(_error, style: TextStyle(color: Colors.red, fontSize: 14.0), textAlign: TextAlign.center)

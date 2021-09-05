@@ -1,6 +1,8 @@
-import 'dart:convert';
+import 'dart:io';
 
+import 'package:dealsabay/hive/boxes.dart';
 import 'package:dealsabay/service/auth_service.dart';
+import 'package:dealsabay/service/database_service.dart';
 import 'package:dealsabay/shared/loading.dart';
 import 'package:dealsabay/view/settings_page.dart';
 import 'package:dealsabay/widget/categories_widget.dart';
@@ -8,6 +10,9 @@ import 'package:dealsabay/widget/deal_item_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:hive/hive.dart';
+import 'package:mailto/mailto.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'authenticate_page.dart';
 
@@ -24,34 +29,192 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
 
   bool _isLoading = true;
-  final AuthService _authService = new AuthService();
+  int _pageNum = 1;
   List _dealItems = [];
+  List _itemsFiltered = [];
+  bool _showLoadMoreItemsButton = true;
+  bool _isInternetConnectivity = true;
+  late Box hiveBox;
+  final AuthService _authService = new AuthService();
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    // getDealsDetailsFromFirebase();
-    getDealsDetailsFromSqlite();
+    hiveBox = Boxes.getComprehensiveDeals();
+    getDealsDetails();
   }
 
-  Future<void> getDealsDetailsFromSqlite() async {
-    final String response = await rootBundle.loadString('assets/response.json');
-    final data = await json.decode(response);
+  Future<void> getDealsDetails() async {
+    if (hiveBox.isNotEmpty) {
+      print("NotEmpty home");
+      try {
+        final result = await InternetAddress.lookup("google.com");
+        if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+          print("Connected to the Internet");
+        }
+      } on SocketException catch(_) {
+        print("No internet connection");
+        setState(() {
+          _isInternetConnectivity = false;
+          _isLoading = false;
+        });
+        return;
+      }
+
+      DateTime setTime = await hiveBox.get('SetTime');
+
+      if (!isHiveDataExpired(setTime)) {
+        if (hiveBox.get("deals") != null) {
+          _itemsFiltered = await hiveBox.get("deals");
+        }
+
+        if (_itemsFiltered == null || _itemsFiltered.isEmpty) {
+          print("NotEmpty outside, empty inside home");
+          try {
+            await getDealsFromFirebaseAndUpdateHive();
+          } catch(e) {
+            print("No internet connection");
+            setState(() {
+              _isInternetConnectivity = false;
+              _isLoading = false;
+            });
+          }
+        }
+
+        if (_itemsFiltered.length > 10) {
+          setState(() {
+            _dealItems = _itemsFiltered.sublist(0, _itemsFiltered.length < 10 ? (_itemsFiltered.length - 1) : 10);
+            _isLoading = false;
+          });
+        } else {
+          setState(() {
+            _showLoadMoreItemsButton = false;
+            _dealItems = _itemsFiltered.sublist(0, _itemsFiltered.length < 10 ? (_itemsFiltered.length - 1) : 10);
+            _isLoading = false;
+          });
+        }
+      } else {
+        // Delete previous data, retrieve from firebase and put in the hiveBox
+        print("Not empty, but data expired");
+        await hiveBox.deleteAll(["SetTime", "deals", "baby-deals", "beauty-deals", "books-deals", "computers-deals",
+          "furniture-deals", "moviesandtv-deals", "homeandkitchen-deals", "fashion-deals", "electronics-deals",
+          "videogames-deals", "miscellaneous-deals"]);
+        try {
+          final result = await InternetAddress.lookup("google.com");
+          if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+            await getDealsFromFirebaseAndUpdateHive();
+          }
+        } on SocketException catch(_) {
+          print("No internet connection");
+          setState(() {
+            _isInternetConnectivity = false;
+            _isLoading = false;
+          });
+        }
+      }
+    } else {
+      print("Empty home");
+      try {
+        final result = await InternetAddress.lookup("google.com");
+        if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+          await getDealsFromFirebaseAndUpdateHive();
+        }
+      } on SocketException catch(_) {
+        print("No internet connection");
+        setState(() {
+          _isInternetConnectivity = false;
+          _isLoading = false;
+        });
+      }
+    }
+  }
+  
+  Future<void> getDealsFromFirebaseAndUpdateHive() async {
+    List items = await DatabaseService().getDealsFromFirestore();
+    _itemsFiltered = items.where((item) {
+      if (item == null || item["ItemInfo"] == null || item["ItemInfo"]["Title"] == null || item["ItemInfo"]["Title"]["DisplayValue"] == null ||
+          item["Offers"] == null || item["Offers"]["Listings"] == null || item["Offers"]["Listings"][0] == null || item["Offers"]["Listings"][0]["Price"] == null || item["Offers"]["Listings"][0]["Price"]["DisplayAmount"] == null || item["Offers"]["Listings"][0]["Price"]["Amount"] == 0 ||
+          item["DetailPageURL"] == null
+      ) {
+        return false;
+      }
+
+      return true;
+    }).toList();
+
+    print("Before");
+    print(hiveBox.toMap());
+
+    hiveBox.put("SetTime", DateTime.now());
+    hiveBox.put("deals", _itemsFiltered);
+
+    print("After");
+    print(hiveBox.toMap());
+
+    if (_itemsFiltered.length > 10) {
+      setState(() {
+        _dealItems = _itemsFiltered.sublist(0, _itemsFiltered.length < 10 ? (_itemsFiltered.length - 1) : 10);
+        _isLoading = false;
+      });
+    } else {
+      setState(() {
+        _showLoadMoreItemsButton = false;
+        _dealItems = _itemsFiltered.sublist(0, _itemsFiltered.length < 10 ? (_itemsFiltered.length - 1) : 10);
+        _isLoading = false;
+      });
+    }
+  }
+
+  bool isHiveDataExpired(setTime) {
+    if (setTime == null || DateTime.now().difference(setTime).inHours >= 4 || DateTime.now().year - setTime.year >= 1 || DateTime.now().month - setTime.month >= 1 || DateTime.now().day - setTime.day >= 1 || DateTime.now().difference(setTime).inMinutes >= 2) {
+      return true;
+    }
+    return false;
+  }
+
+  Future<void> sendFeedbackMail() async {
+    final mailtoLink = Mailto(to: ['dealsabay@gmail.com'], subject: 'Feedback for Dealsabay');
+    await launch('$mailtoLink');
+  }
+
+  void loadMoreItems() {
+    if (_itemsFiltered.length <= (_pageNum + 1) * 10)  {
+      setState(() {
+        _showLoadMoreItemsButton = false;
+        _pageNum++;
+        _dealItems = _itemsFiltered.sublist(0, _itemsFiltered.length);
+      });
+    } else {
+      setState(() {
+        _pageNum++;
+        _dealItems = _itemsFiltered.sublist(0, (_itemsFiltered.length < (_pageNum * 10)) ? _itemsFiltered.length : (_pageNum * 10));
+      });
+    }
+  }
+
+  Future<void> retryInternetConnectivity() async {
+    // if (!hiveBox.isOpen) {
+    //   await Hive.openBox('dealsBox');
+    //   hiveBox = Boxes.getComprehensiveDeals();
+    // }
+
     setState(() {
-      _dealItems = data["SearchResult"]["Items"];
-      _isLoading = false;
+      _isLoading = true;
+      _isInternetConnectivity = true;
     });
+
+    getDealsDetails();
   }
 
   @override
   Widget build(BuildContext context) {
-    return _isLoading ? Loading() : Scaffold(
+    return Scaffold(
       appBar: AppBar(
-        title: Text("DEALSABAY"),
-        elevation: 0.0,
-        centerTitle: true,
-        brightness: Brightness.dark
+          title: Text("DEALSABAY"),
+          elevation: 0.0,
+          centerTitle: true,
+          brightness: Brightness.dark
       ),
       drawer: Drawer(
         child: Container(
@@ -59,13 +222,13 @@ class _HomePageState extends State<HomePage> {
           child: ListView(
             children: <Widget>[
               Container(
-                height: 80.0,
-                color: Theme.of(context).primaryColor,
-                padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
-                child: Align(
-                  alignment: Alignment.bottomLeft,
-                  child: Text('Hi, ' + widget.fullName, style: TextStyle(fontSize: 18.0, color: Theme.of(context).backgroundColor), overflow: TextOverflow.ellipsis),
-                )
+                  height: 80.0,
+                  color: Theme.of(context).primaryColor,
+                  padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
+                  child: Align(
+                    alignment: Alignment.bottomLeft,
+                    child: Text('Hi, ' + widget.fullName, style: TextStyle(fontSize: 18.0, color: Theme.of(context).backgroundColor), overflow: TextOverflow.ellipsis),
+                  )
               ),
 
               ListTile(
@@ -87,7 +250,7 @@ class _HomePageState extends State<HomePage> {
 
               ListTile(
                 onTap: () {
-                  // Navigator.push(context, MaterialPageRoute(builder: (context) => AboutPage()));
+                  sendFeedbackMail();
                 },
                 contentPadding: EdgeInsets.symmetric(horizontal: 15.0, vertical: 0.0),
                 leading: Icon(Icons.feedback_outlined, color: Colors.black87),
@@ -131,7 +294,35 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
       ),
-      body: CustomScrollView(
+      body: _isLoading ? Loading() : !_isInternetConnectivity ? Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text("No Internet Connection", style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)),
+
+            SizedBox(
+              width: 130,
+              child: RaisedButton(
+                  elevation: 0.0,
+                  color: Colors.grey.shade200,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(7.5), side: BorderSide(color: Colors.black87, width: 0.1)),
+                  child: RichText(
+                    text: TextSpan(
+                      children: [
+                        TextSpan(text: "Refresh ", style: TextStyle(fontSize: 18.0, color: Colors.black87)),
+                        WidgetSpan(child: Icon(Icons.refresh, size: 18, color: Colors.green)),
+                      ],
+                    ),
+                  ),
+                  onPressed: () async {
+                    await retryInternetConnectivity();
+                  }
+              ),
+            ),
+          ],
+        ),
+      ) : CustomScrollView(
         slivers: <Widget>[
           SliverList(
             delegate: SliverChildListDelegate(
@@ -143,23 +334,43 @@ class _HomePageState extends State<HomePage> {
 
                 CategoriesWidget(),
 
-                Divider(color: Colors.black38, height: 2.5, thickness: 0.3, indent: 10, endIndent: 10),
+                Divider(color: Colors.black38, height: 20.0, thickness: 0.3, indent: 10, endIndent: 10),
 
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(10.0, 15.0, 0.0, 5.0),
+                  padding: const EdgeInsets.fromLTRB(10.0, 0.0, 0.0, 5.0),
                   child: Text("Today's Deals", style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)),
                 ),
               ],
             ),
           ),
+
           SliverGrid(
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, childAspectRatio: 0.75),
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, childAspectRatio: 0.72),
             delegate: SliverChildListDelegate(
-                _dealItems.map((dealItem) => DealItemWidget(dealItem: dealItem) ).toList()
+              _dealItems.map((dealItem) => DealItemWidget(dealItem: dealItem)).toList()
             ),
           ),
-        ],
-      )
+
+          SliverList(
+            delegate: SliverChildListDelegate([
+              _showLoadMoreItemsButton ? Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 0.0),
+                child: RaisedButton(
+                    elevation: 0.0,
+                    color: Colors.grey.shade200,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(7.5), side: BorderSide(color: Colors.black87, width: 0.1)),
+                    child: Text('Load more items', style: TextStyle(color: Colors.black87, fontSize: 14.0)),
+                    onPressed: () {
+                      loadMoreItems();
+                    }
+                ),
+              ) : SizedBox(height: 0.0),
+
+              SizedBox(height: 40.0)
+            ])
+          ),
+        ]
+      ),
     );
   }
 }
