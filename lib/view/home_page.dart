@@ -47,7 +47,7 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> getDealsDetails() async {
     if (hiveBox.isNotEmpty) {
-      print("NotEmpty home");
+      print("HiveBox is not empty in deals page");
       try {
         final result = await InternetAddress.lookup("google.com");
         if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
@@ -70,7 +70,7 @@ class _HomePageState extends State<HomePage> {
         }
 
         if (_itemsFiltered == null || _itemsFiltered.isEmpty) {
-          print("NotEmpty outside, empty inside home");
+          print("HiveBox is not empty, but the 'deals' key is empty");
           try {
             await getDealsFromFirebaseAndUpdateHive();
           } catch(e) {
@@ -79,6 +79,7 @@ class _HomePageState extends State<HomePage> {
               _isInternetConnectivity = false;
               _isLoading = false;
             });
+            return;
           }
         }
 
@@ -96,7 +97,7 @@ class _HomePageState extends State<HomePage> {
         }
       } else {
         // Delete previous data, retrieve from firebase and put in the hiveBox
-        print("Not empty, but data expired");
+        print("HiveBox is not empty in deals page, but data has been expired");
         await hiveBox.deleteAll(["SetTime", "deals", "baby-deals", "beauty-deals", "books-deals", "computers-deals",
           "furniture-deals", "moviesandtv-deals", "homeandkitchen-deals", "fashion-deals", "electronics-deals",
           "videogames-deals", "miscellaneous-deals"]);
@@ -111,10 +112,11 @@ class _HomePageState extends State<HomePage> {
             _isInternetConnectivity = false;
             _isLoading = false;
           });
+          return;
         }
       }
     } else {
-      print("Empty home");
+      print("HiveBox is empty in deals page");
       try {
         final result = await InternetAddress.lookup("google.com");
         if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
@@ -126,6 +128,7 @@ class _HomePageState extends State<HomePage> {
           _isInternetConnectivity = false;
           _isLoading = false;
         });
+        return;
       }
     }
   }
@@ -143,14 +146,8 @@ class _HomePageState extends State<HomePage> {
       return true;
     }).toList();
 
-    print("Before");
-    print(hiveBox.toMap());
-
     hiveBox.put("SetTime", DateTime.now());
     hiveBox.put("deals", _itemsFiltered);
-
-    print("After");
-    print(hiveBox.toMap());
 
     if (_itemsFiltered.length > 10) {
       setState(() {
@@ -194,11 +191,6 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> retryInternetConnectivity() async {
-    // if (!hiveBox.isOpen) {
-    //   await Hive.openBox('dealsBox');
-    //   hiveBox = Boxes.getComprehensiveDeals();
-    // }
-
     setState(() {
       _isLoading = true;
       _isInternetConnectivity = true;

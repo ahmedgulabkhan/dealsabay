@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:dealsabay/hive/boxes.dart';
-import 'package:dealsabay/service/auth_service.dart';
 import 'package:dealsabay/service/database_service.dart';
 import 'package:dealsabay/shared/loading.dart';
 import 'package:dealsabay/widget/deal_item_widget.dart';
@@ -37,7 +36,7 @@ class _CategoryDealsPageState extends State<CategoryDealsPage> {
 
   Future<void> getCategoryDealsDetails() async {
     if (hiveBox.isNotEmpty) {
-      print("NotEmpty: ${widget.category}");
+      print("HiveBox is not empty in ${widget.category} page");
       try {
         final result = await InternetAddress.lookup("google.com");
         if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
@@ -102,7 +101,7 @@ class _CategoryDealsPageState extends State<CategoryDealsPage> {
         }
 
         if (_itemsFiltered == null || _itemsFiltered.isEmpty) {
-          print("NotEmpty outside, empty inside ${widget.category}");
+          print("HiveBox is not empty, but the '${widget.category}' key is empty");
           try {
             await getCategoryDealsFromFirebaseAndUpdateHive(hiveBox);
           } catch(e) {
@@ -111,6 +110,7 @@ class _CategoryDealsPageState extends State<CategoryDealsPage> {
               _isInternetConnectivity = false;
               _isLoading = false;
             });
+            return;
           }
         }
 
@@ -128,7 +128,7 @@ class _CategoryDealsPageState extends State<CategoryDealsPage> {
         }
       } else {
         // Delete previous data, retrieve from firebase and put in the hiveBox
-        print("Not empty, but data expired");
+        print("HiveBox is not empty in ${widget.category} page, but data has been expired");
         await hiveBox.deleteAll(["SetTime", "deals", "baby-deals", "beauty-deals", "books-deals", "computers-deals",
           "furniture-deals", "moviesandtv-deals", "homeandkitchen-deals", "fashion-deals", "electronics-deals",
           "videogames-deals", "miscellaneous-deals"]);
@@ -143,10 +143,11 @@ class _CategoryDealsPageState extends State<CategoryDealsPage> {
             _isInternetConnectivity = false;
             _isLoading = false;
           });
+          return;
         }
       }
     } else {
-      print("Empty ${widget.category}");
+      print("HiveBox is not empty in ${widget.category} page");
       try {
         final result = await InternetAddress.lookup("google.com");
         if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
@@ -158,6 +159,7 @@ class _CategoryDealsPageState extends State<CategoryDealsPage> {
           _isInternetConnectivity = false;
           _isLoading = false;
         });
+        return;
       }
     }
   }
@@ -262,11 +264,6 @@ class _CategoryDealsPageState extends State<CategoryDealsPage> {
   }
 
   Future<void> retryInternetConnectivity() async {
-    // if (!hiveBox.isOpen) {
-    //   await Hive.openBox('dealsBox');
-    //   hiveBox = Boxes.getComprehensiveDeals();
-    // }
-
     setState(() {
       _isLoading = true;
       _isInternetConnectivity = true;
