@@ -242,7 +242,7 @@ class _CategoryDealsPageState extends State<CategoryDealsPage> {
   }
 
   bool isHiveDataExpired(setTime) {
-    if (setTime == null || DateTime.now().difference(setTime).inHours >= 4 || DateTime.now().year - setTime.year >= 1 || DateTime.now().month - setTime.month >= 1 || DateTime.now().day - setTime.day >= 1 || DateTime.now().difference(setTime).inMinutes >= 2) {
+    if (setTime == null || DateTime.now().difference(setTime).inHours >= 4 || DateTime.now().year - setTime.year >= 1 || DateTime.now().month - setTime.month >= 1 || DateTime.now().day - setTime.day >= 1) {
       return true;
     }
     return false;
