@@ -206,7 +206,7 @@ class _HomePageState extends State<HomePage> {
           title: Text("DEALSABAY"),
           elevation: 0.0,
           centerTitle: true,
-          brightness: Brightness.light
+          brightness: Brightness.dark
       ),
       drawer: Drawer(
         child: Container(
