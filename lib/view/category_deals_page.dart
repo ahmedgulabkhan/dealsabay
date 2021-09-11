@@ -242,7 +242,7 @@ class _CategoryDealsPageState extends State<CategoryDealsPage> {
   }
 
   bool isHiveDataExpired(setTime) {
-    if (setTime == null || DateTime.now().difference(setTime).inHours >= 4 || DateTime.now().year - setTime.year >= 1 || DateTime.now().month - setTime.month >= 1 || DateTime.now().day - setTime.day >= 1) {
+    if (setTime == null || DateTime.now().difference(setTime).inHours >= 5 || DateTime.now().year - setTime.year >= 1 || DateTime.now().month - setTime.month >= 1 || DateTime.now().day - setTime.day >= 1) {
       return true;
     }
     return false;
@@ -315,7 +315,7 @@ class _CategoryDealsPageState extends State<CategoryDealsPage> {
             ),
           ],
         ),
-      ) : CustomScrollView(
+      ) : _categoryDealItems.isNotEmpty ? CustomScrollView(
           slivers: <Widget>[
             SliverGrid(
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, childAspectRatio: 0.72),
@@ -343,6 +343,11 @@ class _CategoryDealsPageState extends State<CategoryDealsPage> {
                 ])
             ),
           ]
+      ) : Center(
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 14.0, vertical: 0.0),
+          child: Text("No '${widget.category}' deals found for today, you can check other categories in the meantime.", style: TextStyle(fontSize: 17.0, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
+        )
       ),
     );
   }

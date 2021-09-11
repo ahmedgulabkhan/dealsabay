@@ -66,6 +66,8 @@ const uploadDealsToFirestore = async (commonParameters, requestParameters) => {
         if (itemsList.length % 10 != 0) break;
     }
 
+    itemsList = getShuffledList(itemsList);
+
     await addData("deals", {Items: JSON.parse(JSON.stringify(itemsList))});
 }
 
@@ -87,6 +89,8 @@ const uploadBabyDealsToFirestore = async (commonParameters, requestParameters) =
 
         if (itemsList.length % 10 != 0) break;
     }
+
+    itemsList = getShuffledList(itemsList);
 
     await addData("baby-deals", {Items: JSON.parse(JSON.stringify(itemsList))});
 }
@@ -110,6 +114,8 @@ const uploadBeautyDealsToFirestore = async (commonParameters, requestParameters)
         if (itemsList.length % 10 != 0) break;
     }
 
+    itemsList = getShuffledList(itemsList);
+
     await addData("beauty-deals", {Items: JSON.parse(JSON.stringify(itemsList))});
 }
 
@@ -131,6 +137,8 @@ const uploadBooksDealsToFirestore = async (commonParameters, requestParameters) 
 
         if (itemsList.length % 10 != 0) break;
     }
+
+    itemsList = getShuffledList(itemsList);
 
     await addData("books-deals", {Items: JSON.parse(JSON.stringify(itemsList))});
 }
@@ -154,6 +162,8 @@ const uploadComputersDealsToFirestore = async (commonParameters, requestParamete
         if (itemsList.length % 10 != 0) break;
     }
 
+    itemsList = getShuffledList(itemsList);
+
     await addData("computers-deals", {Items: JSON.parse(JSON.stringify(itemsList))});
 }
 
@@ -175,6 +185,8 @@ const uploadFurnitureDealsToFirestore = async (commonParameters, requestParamete
 
         if (itemsList.length % 10 != 0) break;
     }
+
+    itemsList = getShuffledList(itemsList);
 
     await addData("furniture-deals", {Items: JSON.parse(JSON.stringify(itemsList))});
 }
@@ -198,6 +210,8 @@ const uploadMoviesAndTVDealsToFirestore = async (commonParameters, requestParame
         if (itemsList.length % 10 != 0) break;
     }
 
+    itemsList = getShuffledList(itemsList);
+
     await addData("moviesandtv-deals", {Items: JSON.parse(JSON.stringify(itemsList))});
 }
 
@@ -219,6 +233,8 @@ const uploadHomeAndKitchenDealsToFirestore = async (commonParameters, requestPar
 
         if (itemsList.length % 10 != 0) break;
     }
+
+    itemsList = getShuffledList(itemsList);
 
     await addData("homeandkitchen-deals", {Items: JSON.parse(JSON.stringify(itemsList))});
 }
@@ -242,6 +258,8 @@ const uploadFashionDealsToFirestore = async (commonParameters, requestParameters
         if (itemsList.length % 10 != 0) break;
     }
 
+    itemsList = getShuffledList(itemsList);
+
     await addData("fashion-deals", {Items: JSON.parse(JSON.stringify(itemsList))});
 }
 
@@ -263,6 +281,8 @@ const uploadElectronicsDealsToFirestore = async (commonParameters, requestParame
 
         if (itemsList.length % 10 != 0) break;
     }
+
+    itemsList = getShuffledList(itemsList);
 
     await addData("electronics-deals", {Items: JSON.parse(JSON.stringify(itemsList))});
 }
@@ -286,6 +306,8 @@ const uploadVideoGamesDealsToFirestore = async (commonParameters, requestParamet
         if (itemsList.length % 10 != 0) break;
     }
 
+    itemsList = getShuffledList(itemsList);
+
     await addData("videogames-deals", {Items: JSON.parse(JSON.stringify(itemsList))});
 }
 
@@ -308,6 +330,8 @@ const uploadMiscellaneousDealsToFirestore = async (commonParameters, requestPara
         if (itemsList.length % 10 != 0) break;
     }
 
+    itemsList = getShuffledList(itemsList);
+
     await addData("miscellaneous-deals", {Items: JSON.parse(JSON.stringify(itemsList))});
 }
 
@@ -317,6 +341,15 @@ const addData = async (collectionPath, data) => {
     }).catch((error) => {
         console.log(error);
     });
+}
+
+const getShuffledList = (list) => {
+    let newList = list.slice()
+    for (let i = newList.length - 1; i > 0; i--) {
+        const rand = Math.floor(Math.random() * (i + 1));
+        [newList[i], newList[rand]] = [newList[rand], newList[i]];
+    }
+    return newList;
 }
 
 const delay = (delayInMs) => {

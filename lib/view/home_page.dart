@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
 import 'package:mailto/mailto.dart';
+import 'package:share/share.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'authenticate_page.dart';
@@ -164,7 +165,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   bool isHiveDataExpired(setTime) {
-    if (setTime == null || DateTime.now().difference(setTime).inHours >= 4 || DateTime.now().year - setTime.year >= 1 || DateTime.now().month - setTime.month >= 1 || DateTime.now().day - setTime.day >= 1) {
+    if (setTime == null || DateTime.now().difference(setTime).inHours >= 5 || DateTime.now().year - setTime.year >= 1 || DateTime.now().month - setTime.month >= 1 || DateTime.now().day - setTime.day >= 1) {
       return true;
     }
     return false;
@@ -173,6 +174,21 @@ class _HomePageState extends State<HomePage> {
   Future<void> sendFeedbackMail() async {
     final mailtoLink = Mailto(to: ['dealsabay@gmail.com'], subject: 'Feedback for Dealsabay');
     await launch('$mailtoLink');
+  }
+
+  Future<void> giveRatingOnPlayStore() async {
+    await launch("https://play.google.com/store/apps/details?id=com.dealsabay.dealsabay");
+  }
+
+  Future<void> shareLinkWithFriends(BuildContext context) async {
+    final RenderBox box = context.findRenderObject() as RenderBox;
+    final String text = "Download the Dealsabay app and find amazing deals online, every single day! 🎉 \n https://play.google.com/store/apps/details?id=com.dealsabay.dealsabay";
+
+    await Share.share(
+        text,
+        subject: "Download the Dealsabay app and find amazing deals online",
+        sharePositionOrigin: box.localToGlobal(Offset.zero) & box.size
+    );
   }
 
   void loadMoreItems() {
@@ -241,8 +257,8 @@ class _HomePageState extends State<HomePage> {
               ),
 
               ListTile(
-                onTap: () {
-                  sendFeedbackMail();
+                onTap: () async {
+                  await sendFeedbackMail();
                 },
                 contentPadding: EdgeInsets.symmetric(horizontal: 15.0, vertical: 0.0),
                 leading: Icon(Icons.feedback_outlined, color: Colors.black87),
@@ -251,18 +267,18 @@ class _HomePageState extends State<HomePage> {
               ),
 
               ListTile(
-                onTap: () {
-                  // Navigator.push(context, MaterialPageRoute(builder: (context) => AboutPage()));
+                onTap: () async {
+                  await giveRatingOnPlayStore();
                 },
                 contentPadding: EdgeInsets.symmetric(horizontal: 15.0, vertical: 0.0),
                 leading: Icon(Icons.star_rate_rounded, color: Colors.black87),
                 horizontalTitleGap: -5.0,
-                title: Text('Rate Us', style: TextStyle(color: Colors.black87, fontSize: 16.0)),
+                title: Text('Rate us on PlayStore', style: TextStyle(color: Colors.black87, fontSize: 16.0)),
               ),
 
               ListTile(
-                onTap: () {
-                  // Navigator.push(context, MaterialPageRoute(builder: (context) => AboutPage()));
+                onTap: () async {
+                  await shareLinkWithFriends(context);
                 },
                 contentPadding: EdgeInsets.symmetric(horizontal: 15.0, vertical: 0.0),
                 leading: Icon(Icons.share, color: Colors.black87),
