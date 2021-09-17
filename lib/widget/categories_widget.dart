@@ -20,6 +20,23 @@ class CategoriesWidget extends StatelessWidget {
               padding: EdgeInsets.all(10.0),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(7.5),
+                color: Colors.cyan,
+              ),
+              child: Center(child: Text('Apparel', style: TextStyle(fontSize: 14.0, color: Colors.white, fontWeight: FontWeight.bold), textAlign: TextAlign.center)),
+            ),
+            onTap: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => CategoryDealsPage(category: "Apparel")));
+            },
+          ),
+
+          SizedBox(width: 10.0),
+
+          GestureDetector(
+            child: Container(
+              width: 100.0,
+              padding: EdgeInsets.all(10.0),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(7.5),
                 color: Colors.green,
               ),
               child: Center(child: Text('Baby', style: TextStyle(fontSize: 14.0, color: Colors.white, fontWeight: FontWeight.bold), textAlign: TextAlign.center)),
@@ -179,6 +196,23 @@ class CategoriesWidget extends StatelessWidget {
             ),
             onTap: () {
               Navigator.push(context, MaterialPageRoute(builder: (context) => CategoryDealsPage(category: "Video Games")));
+            },
+          ),
+
+          SizedBox(width: 10.0),
+
+          GestureDetector(
+            child: Container(
+              width: 100.0,
+              padding: EdgeInsets.all(10.0),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(7.5),
+                color: Colors.pinkAccent,
+              ),
+              child: Center(child: Text('Watches', style: TextStyle(fontSize: 14.0, color: Colors.white, fontWeight: FontWeight.bold), textAlign: TextAlign.center)),
+            ),
+            onTap: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => CategoryDealsPage(category: "Watches")));
             },
           ),
 

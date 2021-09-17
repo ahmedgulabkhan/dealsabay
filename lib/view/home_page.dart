@@ -99,9 +99,9 @@ class _HomePageState extends State<HomePage> {
       } else {
         // Delete previous data, retrieve from firebase and put in the hiveBox
         print("HiveBox is not empty in deals page, but data has been expired");
-        await hiveBox.deleteAll(["SetTime", "deals", "baby-deals", "beauty-deals", "books-deals", "computers-deals",
+        await hiveBox.deleteAll(["SetTime", "deals", "apparel-deals", "baby-deals", "beauty-deals", "books-deals", "computers-deals",
           "furniture-deals", "moviesandtv-deals", "homeandkitchen-deals", "fashion-deals", "electronics-deals",
-          "videogames-deals", "miscellaneous-deals"]);
+          "videogames-deals", "watches-deals", "miscellaneous-deals"]);
         try {
           final result = await InternetAddress.lookup("google.com");
           if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
@@ -182,7 +182,7 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> shareLinkWithFriends(BuildContext context) async {
     final RenderBox box = context.findRenderObject() as RenderBox;
-    final String text = "Download the Dealsabay app and find amazing deals online, every single day! 🎉 \n https://play.google.com/store/apps/details?id=com.dealsabay.dealsabay";
+    final String text = "Download the Dealsabay app and find amazing deals online, every single day! 🎉🎉 \n https://play.google.com/store/apps/details?id=com.dealsabay.dealsabay";
 
     await Share.share(
         text,
@@ -346,7 +346,7 @@ class _HomePageState extends State<HomePage> {
 
                 Padding(
                   padding: const EdgeInsets.fromLTRB(10.0, 0.0, 0.0, 5.0),
-                  child: Text("Today's Deals", style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)),
+                  child: Text("Popular Deals", style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)),
                 ),
               ],
             ),
