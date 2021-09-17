@@ -10,6 +10,7 @@ class DatabaseService {
   // Collection references
   final CollectionReference userCollection = FirebaseFirestore.instance.collection('user');
   final CollectionReference dealsCollection = FirebaseFirestore.instance.collection('deals');
+  final CollectionReference apparelDealsCollection = FirebaseFirestore.instance.collection('apparel-deals');
   final CollectionReference babyDealsCollection = FirebaseFirestore.instance.collection('baby-deals');
   final CollectionReference beautyDealsCollection = FirebaseFirestore.instance.collection('beauty-deals');
   final CollectionReference booksDealsCollection = FirebaseFirestore.instance.collection('books-deals');
@@ -20,6 +21,7 @@ class DatabaseService {
   final CollectionReference fashionDealsCollection = FirebaseFirestore.instance.collection('fashion-deals');
   final CollectionReference electronicsDealsCollection = FirebaseFirestore.instance.collection('electronics-deals');
   final CollectionReference videoGamesDealsCollection = FirebaseFirestore.instance.collection('videogames-deals');
+  final CollectionReference watchesDealsCollection = FirebaseFirestore.instance.collection('watches-deals');
   final CollectionReference miscellaneousDealsCollection = FirebaseFirestore.instance.collection('miscellaneous-deals');
 
   // update user data
@@ -41,6 +43,13 @@ class DatabaseService {
   // get the deals data from firestore
   Future getDealsFromFirestore() async {
     return dealsCollection.get().then((QuerySnapshot querySnapshot) {
+      return querySnapshot.docs.first["Items"];
+    });
+  }
+
+  // get the apparel-deals data from firestore
+  Future getApparelDealsFromFirestore() async {
+    return apparelDealsCollection.get().then((QuerySnapshot querySnapshot) {
       return querySnapshot.docs.first["Items"];
     });
   }
@@ -111,6 +120,13 @@ class DatabaseService {
   // get the videogames-deals data from firestore
   Future getVideoGamesDealsFromFirestore() async {
     return videoGamesDealsCollection.get().then((QuerySnapshot querySnapshot) {
+      return querySnapshot.docs.first["Items"];
+    });
+  }
+
+  // get the watches-deals data from firestore
+  Future getWatchesDealsFromFirestore() async {
+    return watchesDealsCollection.get().then((QuerySnapshot querySnapshot) {
       return querySnapshot.docs.first["Items"];
     });
   }

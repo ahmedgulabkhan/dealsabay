@@ -54,7 +54,11 @@ class _CategoryDealsPageState extends State<CategoryDealsPage> {
       DateTime setTime = await hiveBox.get('SetTime');
 
       if (!isHiveDataExpired(setTime)) {
-        if (widget.category == "Baby") {
+        if (widget.category == "Apparel") {
+          if (hiveBox.get("apparel-deals") != null) {
+            _itemsFiltered = await hiveBox.get("apparel-deals");
+          }
+        } else if (widget.category == "Baby") {
           if (hiveBox.get("baby-deals") != null) {
             _itemsFiltered = await hiveBox.get("baby-deals");
           }
@@ -94,6 +98,10 @@ class _CategoryDealsPageState extends State<CategoryDealsPage> {
           if (hiveBox.get("videogames-deals") != null) {
             _itemsFiltered = await hiveBox.get("videogames-deals");
           }
+        } else if (widget.category == "Watches") {
+          if (hiveBox.get("watches-deals") != null) {
+            _itemsFiltered = await hiveBox.get("watches-deals");
+          }
         } else if (widget.category == "Miscellaneous") {
           if (hiveBox.get("miscellaneous-deals") != null) {
             _itemsFiltered = await hiveBox.get("miscellaneous-deals");
@@ -129,9 +137,9 @@ class _CategoryDealsPageState extends State<CategoryDealsPage> {
       } else {
         // Delete previous data, retrieve from firebase and put in the hiveBox
         print("HiveBox is not empty in ${widget.category} page, but data has been expired");
-        await hiveBox.deleteAll(["SetTime", "deals", "baby-deals", "beauty-deals", "books-deals", "computers-deals",
+        await hiveBox.deleteAll(["SetTime", "deals", "apparel-deals", "baby-deals", "beauty-deals", "books-deals", "computers-deals",
           "furniture-deals", "moviesandtv-deals", "homeandkitchen-deals", "fashion-deals", "electronics-deals",
-          "videogames-deals", "miscellaneous-deals"]);
+          "videogames-deals", "watches-deals", "miscellaneous-deals"]);
         try {
           final result = await InternetAddress.lookup("google.com");
           if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
@@ -166,7 +174,9 @@ class _CategoryDealsPageState extends State<CategoryDealsPage> {
 
   Future<void> getCategoryDealsFromFirebaseAndUpdateHive(hiveBox) async {
     List items = [];
-    if (widget.category == "Baby") {
+    if (widget.category == "Apparel") {
+      items = await DatabaseService().getApparelDealsFromFirestore();
+    } else if (widget.category == "Baby") {
       items = await DatabaseService().getBabyDealsFromFirestore();
     } else if (widget.category == "Beauty") {
       items = await DatabaseService().getBeautyDealsFromFirestore();
@@ -186,6 +196,8 @@ class _CategoryDealsPageState extends State<CategoryDealsPage> {
       items = await DatabaseService().getElectronicsDealsFromFirestore();
     } else if (widget.category == "Video Games") {
       items = await DatabaseService().getVideoGamesDealsFromFirestore();
+    } else if (widget.category == "Watches") {
+      items = await DatabaseService().getWatchesDealsFromFirestore();
     } else if (widget.category == "Miscellaneous") {
       items = await DatabaseService().getMiscellaneousDealsFromFirestore();
     }
@@ -203,7 +215,9 @@ class _CategoryDealsPageState extends State<CategoryDealsPage> {
 
     hiveBox.put("SetTime", DateTime.now());
 
-    if (widget.category == "Baby") {
+    if (widget.category == "Apparel") {
+      hiveBox.put("apparel-deals", _itemsFiltered);
+    } else if (widget.category == "Baby") {
       hiveBox.put("baby-deals", _itemsFiltered);
     } else if (widget.category == "Beauty") {
       hiveBox.put("beauty-deals", _itemsFiltered);
@@ -223,6 +237,8 @@ class _CategoryDealsPageState extends State<CategoryDealsPage> {
       hiveBox.put("electronics-deals", _itemsFiltered);
     } else if (widget.category == "Video Games") {
       hiveBox.put("videogames-deals", _itemsFiltered);
+    } else if (widget.category == "Watches") {
+      hiveBox.put("watches-deals", _itemsFiltered);
     } else if (widget.category == "Miscellaneous") {
       hiveBox.put("miscellaneous-deals", _itemsFiltered);
     }

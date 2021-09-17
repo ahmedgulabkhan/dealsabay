@@ -153,9 +153,9 @@ class DealItemDetailsPage extends StatelessWidget {
               children: [
                 RichText(
                   text: TextSpan(
-                    text: "Brand: ", style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold, color: Colors.black87),
+                    text: "Brand: ", style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold, color: Colors.black87),
                     children: <TextSpan>[
-                      TextSpan(text: dealItem["ItemInfo"]["ByLineInfo"]["Brand"]["DisplayValue"], style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.normal)),
+                      TextSpan(text: dealItem["ItemInfo"]["ByLineInfo"]["Brand"]["DisplayValue"], style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.normal)),
                     ],
                   ),
                   maxLines: 2,
@@ -170,9 +170,9 @@ class DealItemDetailsPage extends StatelessWidget {
             padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 0.0),
             child: RichText(
               text: TextSpan(
-                text: "Manufacturer: ", style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold, color: Colors.black87),
+                text: "Manufacturer: ", style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold, color: Colors.black87),
                 children: <TextSpan>[
-                  TextSpan(text: dealItem["ItemInfo"]["ByLineInfo"]["Manufacturer"]["DisplayValue"], style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.normal)),
+                  TextSpan(text: dealItem["ItemInfo"]["ByLineInfo"]["Manufacturer"]["DisplayValue"], style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.normal)),
                 ],
               ),
               maxLines: 2,
@@ -184,12 +184,12 @@ class DealItemDetailsPage extends StatelessWidget {
 
           featuresList.isNotEmpty ? Padding(
             padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 0.0),
-            child: Text("Features:", style: TextStyle(fontSize: 17.0, fontWeight: FontWeight.bold)),
+            child: Text("Features:", style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)),
           ) : SizedBox(height: 0.0),
 
           for(String feature in featuresList) Padding(
               padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 0.0),
-              child: Text("● $feature", style: TextStyle(fontSize: 15.0))
+              child: Text("● $feature", style: TextStyle(fontSize: 16.0))
           ),
 
           SizedBox(height: 15.0),

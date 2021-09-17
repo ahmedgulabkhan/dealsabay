@@ -19,7 +19,7 @@ exports.handler = async (event, context, callback) => {
     };
 
     const requestParameters = {
-        Keywords: "Today's deals",
+        Keywords: "Deal of the day",
         Resources: [
             'Images.Primary.Large',
             'Images.Variants.Large',
@@ -33,6 +33,7 @@ exports.handler = async (event, context, callback) => {
 
     await clearPreviousDataFromFirestore();
     await uploadDealsToFirestore(commonParameters, requestParameters);
+    await uploadApparelDealsToFirestore(commonParameters, requestParameters);
     await uploadBabyDealsToFirestore(commonParameters, requestParameters);
     await uploadBeautyDealsToFirestore(commonParameters, requestParameters);
     await uploadBooksDealsToFirestore(commonParameters, requestParameters);
@@ -43,6 +44,7 @@ exports.handler = async (event, context, callback) => {
     await uploadFashionDealsToFirestore(commonParameters, requestParameters);
     await uploadElectronicsDealsToFirestore(commonParameters, requestParameters);
     await uploadVideoGamesDealsToFirestore(commonParameters, requestParameters);
+    await uploadWatchesDealsToFirestore(commonParameters, requestParameters);
     await uploadMiscellaneousDealsToFirestore(commonParameters, requestParameters);
 
 }
@@ -63,12 +65,36 @@ const uploadDealsToFirestore = async (commonParameters, requestParameters) => {
                 console.log(error);
             });
 
-        if (itemsList.length % 10 != 0) break;
+        if (itemsList.length % 10 !== 0) break;
     }
 
     itemsList = getShuffledList(itemsList);
 
     await addData("deals", {Items: JSON.parse(JSON.stringify(itemsList))});
+}
+
+const uploadApparelDealsToFirestore = async (commonParameters, requestParameters) => {
+    const requestParametersUpdated = {...requestParameters, SearchIndex: 'Apparel'};
+    let itemsList = [];
+
+    for (let i=1; i<=10; i++) {
+        await delay(1500);
+
+        requestParametersUpdated['ItemPage'] = i;
+        await amazonPaapi.SearchItems(commonParameters, requestParametersUpdated)
+            .then((data) => {
+                itemsList.push(...data['SearchResult']['Items']);
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+
+        if (itemsList.length % 10 !== 0) break;
+    }
+
+    itemsList = getShuffledList(itemsList);
+
+    await addData("apparel-deals", {Items: JSON.parse(JSON.stringify(itemsList))});
 }
 
 const uploadBabyDealsToFirestore = async (commonParameters, requestParameters) => {
@@ -87,7 +113,7 @@ const uploadBabyDealsToFirestore = async (commonParameters, requestParameters) =
                 console.log(error);
             });
 
-        if (itemsList.length % 10 != 0) break;
+        if (itemsList.length % 10 !== 0) break;
     }
 
     itemsList = getShuffledList(itemsList);
@@ -111,7 +137,7 @@ const uploadBeautyDealsToFirestore = async (commonParameters, requestParameters)
                 console.log(error);
             });
 
-        if (itemsList.length % 10 != 0) break;
+        if (itemsList.length % 10 !== 0) break;
     }
 
     itemsList = getShuffledList(itemsList);
@@ -135,7 +161,7 @@ const uploadBooksDealsToFirestore = async (commonParameters, requestParameters) 
                 console.log(error);
             });
 
-        if (itemsList.length % 10 != 0) break;
+        if (itemsList.length % 10 !== 0) break;
     }
 
     itemsList = getShuffledList(itemsList);
@@ -159,7 +185,7 @@ const uploadComputersDealsToFirestore = async (commonParameters, requestParamete
                 console.log(error);
             });
 
-        if (itemsList.length % 10 != 0) break;
+        if (itemsList.length % 10 !== 0) break;
     }
 
     itemsList = getShuffledList(itemsList);
@@ -183,7 +209,7 @@ const uploadFurnitureDealsToFirestore = async (commonParameters, requestParamete
                 console.log(error);
             });
 
-        if (itemsList.length % 10 != 0) break;
+        if (itemsList.length % 10 !== 0) break;
     }
 
     itemsList = getShuffledList(itemsList);
@@ -207,7 +233,7 @@ const uploadMoviesAndTVDealsToFirestore = async (commonParameters, requestParame
                 console.log(error);
             });
 
-        if (itemsList.length % 10 != 0) break;
+        if (itemsList.length % 10 !== 0) break;
     }
 
     itemsList = getShuffledList(itemsList);
@@ -231,7 +257,7 @@ const uploadHomeAndKitchenDealsToFirestore = async (commonParameters, requestPar
                 console.log(error);
             });
 
-        if (itemsList.length % 10 != 0) break;
+        if (itemsList.length % 10 !== 0) break;
     }
 
     itemsList = getShuffledList(itemsList);
@@ -255,7 +281,7 @@ const uploadFashionDealsToFirestore = async (commonParameters, requestParameters
                 console.log(error);
             });
 
-        if (itemsList.length % 10 != 0) break;
+        if (itemsList.length % 10 !== 0) break;
     }
 
     itemsList = getShuffledList(itemsList);
@@ -279,7 +305,7 @@ const uploadElectronicsDealsToFirestore = async (commonParameters, requestParame
                 console.log(error);
             });
 
-        if (itemsList.length % 10 != 0) break;
+        if (itemsList.length % 10 !== 0) break;
     }
 
     itemsList = getShuffledList(itemsList);
@@ -303,12 +329,36 @@ const uploadVideoGamesDealsToFirestore = async (commonParameters, requestParamet
                 console.log(error);
             });
 
-        if (itemsList.length % 10 != 0) break;
+        if (itemsList.length % 10 !== 0) break;
     }
 
     itemsList = getShuffledList(itemsList);
 
     await addData("videogames-deals", {Items: JSON.parse(JSON.stringify(itemsList))});
+}
+
+const uploadWatchesDealsToFirestore = async (commonParameters, requestParameters) => {
+    const requestParametersUpdated = {...requestParameters, SearchIndex: 'Watches'};
+    let itemsList = [];
+
+    for (let i=1; i<=10; i++) {
+        await delay(1500);
+
+        requestParametersUpdated['ItemPage'] = i;
+        await amazonPaapi.SearchItems(commonParameters, requestParametersUpdated)
+            .then((data) => {
+                itemsList.push(...data['SearchResult']['Items']);
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+
+        if (itemsList.length % 10 !== 0) break;
+    }
+
+    itemsList = getShuffledList(itemsList);
+
+    await addData("watches-deals", {Items: JSON.parse(JSON.stringify(itemsList))});
 }
 
 const uploadMiscellaneousDealsToFirestore = async (commonParameters, requestParameters) => {
@@ -327,7 +377,7 @@ const uploadMiscellaneousDealsToFirestore = async (commonParameters, requestPara
                 console.log(error);
             });
 
-        if (itemsList.length % 10 != 0) break;
+        if (itemsList.length % 10 !== 0) break;
     }
 
     itemsList = getShuffledList(itemsList);
@@ -360,6 +410,12 @@ const clearPreviousDataFromFirestore = async () => {
     await db.collection('deals').listDocuments().then(mapVal => {
         mapVal.map((val) => {
             val.delete().then(() => console.log("Cleared up deals"));
+        });
+    });
+
+    await db.collection('apparel-deals').listDocuments().then(mapVal => {
+        mapVal.map((val) => {
+            val.delete().then(() => console.log("Cleared up apparel-deals"));
         });
     });
 
@@ -420,6 +476,12 @@ const clearPreviousDataFromFirestore = async () => {
     await db.collection('videogames-deals').listDocuments().then(mapVal => {
         mapVal.map((val) => {
             val.delete().then(() => console.log("Cleared up videogames-deals"));
+        });
+    });
+
+    await db.collection('watches-deals').listDocuments().then(mapVal => {
+        mapVal.map((val) => {
+            val.delete().then(() => console.log("Cleared up watches-deals"));
         });
     });
 
