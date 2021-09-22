@@ -4,6 +4,7 @@ import 'package:dealsabay/hive/boxes.dart';
 import 'package:dealsabay/service/auth_service.dart';
 import 'package:dealsabay/service/database_service.dart';
 import 'package:dealsabay/shared/loading.dart';
+import 'package:dealsabay/view/browse_category_page.dart';
 import 'package:dealsabay/view/settings_page.dart';
 import 'package:dealsabay/widget/categories_widget.dart';
 import 'package:dealsabay/widget/deal_item_widget.dart';
@@ -248,12 +249,22 @@ class _HomePageState extends State<HomePage> {
 
               ListTile(
                 onTap: () {
+                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => BrowseCategoryPage(fullName: widget.fullName, email: widget.email)));
+                },
+                contentPadding: EdgeInsets.symmetric(horizontal: 15.0, vertical: 0.0),
+                leading: Icon(Icons.category_rounded, color: Colors.black87),
+                horizontalTitleGap: -5.0,
+                title: Text('Browse Categories', style: TextStyle(fontSize: 16.0, color: Colors.black87)),
+              ),
+
+              ListTile(
+                onTap: () {
                   Navigator.push(context, MaterialPageRoute(builder: (context) => SettingsPage(fullName: widget.fullName, email: widget.email)));
                 },
                 contentPadding: EdgeInsets.symmetric(horizontal: 15.0, vertical: 0.0),
                 leading: Icon(Icons.settings, color: Colors.black87),
                 horizontalTitleGap: -5.0,
-                title: Text('Settings', style: TextStyle(color: Colors.black87, fontSize: 16.0)),
+                title: Text('Settings', style: TextStyle(fontSize: 16.0, color: Colors.black87)),
               ),
 
               ListTile(
@@ -263,7 +274,7 @@ class _HomePageState extends State<HomePage> {
                 contentPadding: EdgeInsets.symmetric(horizontal: 15.0, vertical: 0.0),
                 leading: Icon(Icons.feedback_outlined, color: Colors.black87),
                 horizontalTitleGap: -5.0,
-                title: Text('Feedback', style: TextStyle(color: Colors.black87, fontSize: 16.0)),
+                title: Text('Feedback', style: TextStyle(fontSize: 16.0, color: Colors.black87)),
               ),
 
               ListTile(
@@ -273,7 +284,7 @@ class _HomePageState extends State<HomePage> {
                 contentPadding: EdgeInsets.symmetric(horizontal: 15.0, vertical: 0.0),
                 leading: Icon(Icons.star_rate_rounded, color: Colors.black87),
                 horizontalTitleGap: -5.0,
-                title: Text('Rate us on PlayStore', style: TextStyle(color: Colors.black87, fontSize: 16.0)),
+                title: Text('Rate us on PlayStore', style: TextStyle(fontSize: 16.0, color: Colors.black87)),
               ),
 
               ListTile(
@@ -283,7 +294,7 @@ class _HomePageState extends State<HomePage> {
                 contentPadding: EdgeInsets.symmetric(horizontal: 15.0, vertical: 0.0),
                 leading: Icon(Icons.share, color: Colors.black87),
                 horizontalTitleGap: -5.0,
-                title: Text('Share with Friends', style: TextStyle(color: Colors.black87, fontSize: 16.0)),
+                title: Text('Share with Friends', style: TextStyle(fontSize: 16.0, color: Colors.black87)),
               ),
 
               Divider(color: Colors.black38, height: 2.5, thickness: 0.3, indent: 10, endIndent: 10),
@@ -296,7 +307,7 @@ class _HomePageState extends State<HomePage> {
                 contentPadding: EdgeInsets.symmetric(horizontal: 15.0, vertical: 0.0),
                 leading: Icon(Icons.exit_to_app, color: Color(0xFFDC143C)),
                 horizontalTitleGap: -5.0,
-                title: Text('Sign Out', style: TextStyle(color: Color(0xFFDC143C), fontSize: 16.0)),
+                title: Text('Sign Out', style: TextStyle(fontSize: 16.0, color: Color(0xFFDC143C))),
               ),
             ],
           ),
@@ -340,7 +351,7 @@ class _HomePageState extends State<HomePage> {
                   child: Text('Categories', style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)),
                 ),
 
-                CategoriesWidget(),
+                CategoriesWidget(fullName: widget.fullName, email: widget.email),
 
                 Divider(color: Colors.black38, height: 20.0, thickness: 0.3, indent: 10, endIndent: 10),
 
